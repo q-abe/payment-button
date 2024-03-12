@@ -1,39 +1,39 @@
 <script>
     const target = document.querySelector(".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment");
     const countObj = {
-        creditRadioNode: 0,
-        creditButtonNode: 0,
-        cashRadioNode: 0,
-        cashButtonNode: 0
+        creditRadioNode: false,
+        creditButtonNode: false,
+        cashRadioNode: false,
+        cashButtonNode: false
     };
 
     const domObserver = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']")) {
-                countObj.creditRadioNode++;
+                countObj.creditRadioNode = true;
                 console.log("creditRadioNode rendered");
             }
         });
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
-                countObj.creditButtonNode++;
+                countObj.creditButtonNode = true;
                 console.log("creditButtonNode rendered");
             }
         });
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
-                countObj.cashRadioNode++;
+                countObj.cashRadioNode = true;
                 console.log("cashRadioNode rendered");
             }
         });
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
-                countObj.cashButtonNode++;
+                countObj.cashButtonNode = true;
                 console.log("cashButtonNode rendered");
             }
         });
 
-        if (Object.values(countObj).every(count => count > 0)) {
+        if (Object.values(countObj).every(count => count)) {
             console.log("all targets rendered");
             domObserver.disconnect();
             addButtonFn();
