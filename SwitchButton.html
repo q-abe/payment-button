@@ -126,21 +126,10 @@
             const copiedCash = document.querySelector("#copiedCash");
             const initialButton = document.querySelector("#initialButton");
 
-            const creditRadioParentDiv = document.getElementsByClassName("bat-form-field bat-form--cashondelivery-payment-credit-card-header")[0];
-            const creditRadio = creditRadioParentDiv.querySelector(`input`);
-
-            const creditCheckBox = document.getElementsByName("termsOfUse")[0];
-
-            const creditOriginButtonParentDiv = document.getElementsByClassName("bat-form-field bat-form--cashondelivery-payment-submit")[0];
-            const creditOriginButton = creditOriginButtonParentDiv.querySelector(`button`);
-
-            const cashRadioParentDiv = document.getElementsByClassName("cashondelivery-method-section")[0];
-            const cashRadio = cashRadioParentDiv.querySelector(`input`);
-
-            const cashCheckBox = document.getElementsByClassName("payment-checkbox")[0];
-
-            const cashOriginButtonParentDiv = document.getElementsByClassName("confirm-order-button-block")[0];
-            const cashOriginButton = cashOriginButtonParentDiv.querySelector(`a`);
+            const creditRadio = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']");
+            const cashRadio = document.querySelector(".cashondelivery-method-section input[name='creditCardHeader']");
+            const creditOriginButton = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']");
+            const cashOriginButton = document.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']");
 
             if (copiedCredit && copiedCash && initialButton && creditRadio && creditOriginButton && cashRadio && cashOriginButton) {
                 /**
