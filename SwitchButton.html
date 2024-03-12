@@ -1,129 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<div>
-    <div>
-        <div class="bat-form-field bat-form--cashondelivery-payment-credit-card-header" style="margin-bottom: 0px;">
-            <fieldset class="bat-form-field-set required complete">
-                <label>
-                    <input type="radio" name="creditCardHeader" value="クレジットカードまたはデビットカード">
-                    <span>クレジットカードまたはデビットカード</span>
-                </label>
-            </fieldset>
-        </div>
+<script>
+    const target = document.querySelector(".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment");
+    const countObj = {
+        creditRadioNode: 0,
+        creditButtonNode: 0,
+        cashRadioNode: 0,
+        cashButtonNode: 0
+    };
 
-        <div class="bat-form-field bat-form--cashondelivery-payment-terms-of-use  ">
-            <fieldset class="bat-form-field-set required error">
-                <label>
-                    <input type="checkbox" name="termsOfUse" value="true">
-                    <span>「利用規約」に同意のうえ、チェックを入れて注文を確定してください。</span>
-                </label>
-            </fieldset>
-        </div>
-
-        <div class="bat-form-field bat-form--cashondelivery-payment-submit">
-            <button type="button" class="bat-cta-style button-secondary-dark" disabled="disabled">
-                <span>注文を確定する</span>
-            </button>
-        </div>
-
-        <br />
-        <br />
-        <br />
-        <br />
-
-        <div>
-            <div class="cashondelivery-method-section">
-                <label>
-                    <input type="radio" class="cashondelivery-method-radiobtn" name="creditCardHeader">
-                    <span id="cashondelivery-method-name">代引き決済</span>
-                    <span id="cashondelivery-method-price">330円（税込）</span>
-                </label>
-            </div>
-
-            <fieldset class="radio-button-toggle" style="display: block; margin-top: 30px;">
-                <div class="cod-payment-method-error" style="display: none;"></div>
-                <div class="cod-container"></div>
-                <label class="checkbox-section-2 custom-boder-style-2">
-                    <input type="checkbox" class="payment-checkbox">
-                    <span class="terms-condition-checkbox-value">「利用規約」に同意のうえ、チェックを入れて注文を確定してください。</span><br><br>
-                </label>
-            </fieldset>
-
-            <div class="confirm-order-button-block">
-                <a href="https://www.shopglovelo.jp/checkout" data-cta-type="internal"
-                   class="bat-cta-style button-secondary-dark center disabled">
-                    <span class="button-text">注文を確定する</span>
-                    ::after
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div>
-        <div>
-            <button class="clicker disabled" id="initialButton">初期値ボタン</button>
-        </div>
-        <div>
-            <button class="clicker disabled hidden" id="copiedCredit">クレジット決済</button>
-        </div>
-        <div>
-            <button class="clicker disabled hidden" id="copiedCash">代引き決済</button>
-        </div>
-    </div>
-
-    <script>
-        const target = document.querySelector(".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment");
-        const countObj = {
-            creditRadioNode: 0,
-            creditButtonNode: 0,
-            cashRadioNode: 0,
-            cashButtonNode: 0
-        };
-
-        const domObserver = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']")) {
-                    countObj.creditRadioNode++;
-                }
-            });
-            mutations.forEach(mutation => {
-                if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
-                    countObj.creditButtonNode++;
-                }
-            });
-            mutations.forEach(mutation => {
-                if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
-                    countObj.cashRadioNode++;
-                }
-            });
-            mutations.forEach(mutation => {
-                if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
-                    countObj.cashButtonNode++;
-                }
-            });
-
-            if (Object.values(countObj).every(count => count > 0)) {
-                console.log("", countObj);
-                addButtonFn();
-                afterLoadingFn();
-                domObserver.disconnect();
+    const domObserver = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']")) {
+                countObj.creditRadioNode++;
+            }
+        });
+        mutations.forEach(mutation => {
+            if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
+                countObj.creditButtonNode++;
+            }
+        });
+        mutations.forEach(mutation => {
+            if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
+                countObj.cashRadioNode++;
+            }
+        });
+        mutations.forEach(mutation => {
+            if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
+                countObj.cashButtonNode++;
             }
         });
 
-        domObserver.observe(target, {
-            childList: true,
-            subtree: true
-        });
+        if (Object.values(countObj).every(count => count > 0)) {
+            domObserver.disconnect();
+            addButtonFn();
+            afterLoadingFn();
+        }
+    });
 
-        const addButtonFn = () => {
-            if (!document.getElementById("initialButton")) {
-                const addTarget = document.getElementById("cashondeliveryForm");
-                const addButton = `
+    domObserver.observe(target, {
+        childList: true,
+        subtree: true
+    });
+
+    const addButtonFn = () => {
+        const addTarget = document.getElementById("cashondeliveryForm");
+        const addButton = `
                 <div>
                     <button class="clicker disabled" id="initialButton">初期値ボタン</button>
                 </div>
@@ -134,140 +54,129 @@
                     <button class="clicker disabled hidden" id="copiedCash">代引き決済</button>
                 </div>`;
 
-                domObserver.disconnect();
+        addTarget.insertAdjacentHTML("afterend", addButton);
+    };
 
-                addTarget.insertAdjacentHTML("afterend", addButton);
+    const afterLoadingFn = () => {
+        const copiedCredit = document.querySelector("#copiedCredit");
+        const copiedCash = document.querySelector("#copiedCash");
+        const initialButton = document.querySelector("#initialButton");
 
-                domObserver.observe(target, {
-                        childList: true,
-                        subtree: true
+        const creditRadio = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']");
+        const cashRadio = document.querySelector(".cashondelivery-method-section input[name='creditCardHeader']");
+        const creditOriginButton = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']");
+        const cashOriginButton = document.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']");
+
+        if (copiedCredit && copiedCash && initialButton) {
+            /**
+             *支払いをクレジットにしたとき、代引きの購入確定ボタンを非表示にする
+             */
+            creditRadio.addEventListener("change", () => {
+                copiedCredit.classList.remove("hidden");
+                copiedCash.classList.add("hidden");
+                initialButton.classList.add("hidden");
+            });
+
+            //支払いを代引きにしたとき、クレジットの購入確定ボタンを非表示にする
+            cashRadio.addEventListener("change", () => {
+                copiedCredit.classList.add("hidden");
+                copiedCash.classList.remove("hidden");
+                initialButton.classList.add("hidden");
+            });
+
+            //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
+            copiedCredit.addEventListener("click", () => {
+                const clickEvent = new Event("click");
+                creditOriginButton.dispatchEvent(clickEvent);
+            });
+
+            //代引きの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
+            copiedCash.addEventListener("click", () => {
+                const clickEvent = new Event("click");
+                cashOriginButton.click();
+            });
+
+            //監視オブジェクトのインスタンス化
+            const creditObserver = new MutationObserver(mutations => {
+                mutations.forEach((record) => {
+                    const disableValue = record.target.getAttribute("disabled");
+                    //クレジットの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
+                    if (disableValue === "" || disableValue === "disabled") {
+                        copiedCredit.classList.add("disabled");
+                    } else {
+                        copiedCredit.classList.remove("disabled");
                     }
-                );
-            }
-        };
-
-        const afterLoadingFn = () => {
-            const copiedCredit = document.querySelector("#copiedCredit");
-            const copiedCash = document.querySelector("#copiedCash");
-            const initialButton = document.querySelector("#initialButton");
-
-            const creditRadio = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']");
-            const cashRadio = document.querySelector(".cashondelivery-method-section input[name='creditCardHeader']");
-            const creditOriginButton = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']");
-            const cashOriginButton = document.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']");
-
-            if (copiedCredit && copiedCash && initialButton && creditRadio && creditOriginButton && cashRadio && cashOriginButton) {
-                /**
-                 *支払いをクレジットにしたとき、代引きの購入確定ボタンを非表示にする
-                 */
-                creditRadio.addEventListener("change", () => {
-                    copiedCredit.classList.remove("hidden");
-                    copiedCash.classList.add("hidden");
-                    initialButton.classList.add("hidden");
                 });
+            });
 
-                //支払いを代引きにしたとき、クレジットの購入確定ボタンを非表示にする
-                cashRadio.addEventListener("change", () => {
-                    copiedCredit.classList.add("hidden");
-                    copiedCash.classList.remove("hidden");
-                    initialButton.classList.add("hidden");
+            //監視オブジェクトによる監視開始(クレジット購入ボタンの属性の変化)
+            creditObserver.observe(creditOriginButton, {
+                attributes: true
+            });
+
+            //監視オブジェクトのインスタンス化
+            const cashObserver = new MutationObserver(mutations => {
+                mutations.forEach((record) => {
+                    //代引きの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
+                    if (record.target.classList.contains("disabled")) {
+                        copiedCash.classList.add("disabled");
+                    } else {
+                        copiedCash.classList.remove("disabled");
+                    }
                 });
+            });
 
-                //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
-                copiedCredit.addEventListener("click", () => {
-                    const clickEvent = new Event("click");
-                    creditOriginButton.dispatchEvent(clickEvent);
-                });
+            //監視オブジェクトによる監視開始(代引き購入ボタンのクラス属性の変化)
+            cashObserver.observe(cashOriginButton, {
+                attributes: true,
+                attributeFilter: ["class"]
+            });
+        } else {
+            console.log("変数ないよ");
+        }
+    };
+</script>
 
-                //代引きの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
-                copiedCash.addEventListener("click", () => {
-                    const clickEvent = new Event("click");
-                    cashOriginButton.click();
-                });
+<style>
+    button.clicker.disabled {
+        pointer-events: none;
+        background-color: #ccc;
+        color: #aaa;
+        }
 
-                //監視オブジェクトのインスタンス化
-                const creditObserver = new MutationObserver(mutations => {
-                    mutations.forEach((record) => {
-                        const disableValue = record.target.getAttribute("disabled");
-                        //クレジットの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
-                        if (disableValue === "" || disableValue === "disabled") {
-                            copiedCredit.classList.add("disabled");
-                        } else {
-                            copiedCredit.classList.remove("disabled");
-                        }
-                    });
-                });
+    div.bat-form-field.bat-form--cashondelivery-payment-submit {
+        display: none;
+        }
 
-                //監視オブジェクトによる監視開始(クレジット購入ボタンの属性の変化)
-                creditObserver.observe(creditOriginButton, {
-                    attributes: true
-                });
+    a.bat-cta-style.button-secondary-dark.center {
+        display: none;
+        }
 
-                //監視オブジェクトのインスタンス化
-                const cashObserver = new MutationObserver(mutations => {
-                    mutations.forEach((record) => {
-                        //代引きの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
-                        if (record.target.classList.contains("disabled")) {
-                            copiedCash.classList.add("disabled");
-                        } else {
-                            copiedCash.classList.remove("disabled");
-                        }
-                    });
-                });
+    a.bat-cta-style.button-secondary-dark.center.disabled {
+        pointer-events: none;
+        background: #dedede;
+        cursor: not-allowed;
+        opacity: 1;
+        color: #aaa;
+        display: none;
+        }
 
-                //監視オブジェクトによる監視開始(代引き購入ボタンのクラス属性の変化)
-                cashObserver.observe(cashOriginButton, {
-                    attributes: true,
-                    attributeFilter: ["class"]
-                });
-            } else {
-                console.log("変数ないよ");
-            }
-        };
-    </script>
+    button.clicker.hidden {
+        display: none;
+        }
 
-    <style>
-        button.clicker.disabled {
-            pointer-events: none;
-            background-color: #ccc;
-            color: #aaa;
-            }
+    button.clicker {
+        background-color: #f5c342;
+        border: 0;
+        color: black;
+        display: flex;
 
-        div.bat-form-field.bat-form--cashondelivery-payment-submit {
-            display: none;
-            }
-
-        a.bat-cta-style.button-secondary-dark.center {
-            display: none;
-            }
-
-        a.bat-cta-style.button-secondary-dark.center.disabled {
-            pointer-events: none;
-            background: #dedede;
-            cursor: not-allowed;
-            opacity: 1;
-            color: #aaa;
-            display: none;
-            }
-
-        button.clicker.hidden {
-            display: none;
-            }
-
-        button.clicker {
-            background-color: #f5c342;
-            border: 0;
-            color: black;
-            display: flex;
-
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 45px;
-            border-radius: 50px;
-            font: inherit;
-            font-weight: bold;
-            }
-    </style>
-</body>
-</html>
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 45px;
+        border-radius: 50px;
+        font: inherit;
+        font-weight: bold;
+        }
+</style>
