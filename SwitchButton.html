@@ -79,15 +79,41 @@
     <script>
         const parentTarget = document.getElementsByClassName("form aem-GridColumn--tablet--10 aem-GridColumn--phone--none aem-GridColumn--tablet--none aem-GridColumn--phone--10 aem-GridColumn aem-GridColumn--offset--phone--1 aem-GridColumn--default--5 aem-GridColumn--offset--tablet--1");
         const target = parentTarget[2].querySelector("bat-form-cashondeliverypayment");
+        const countObj = {
+            creditRadioNode: 0,
+            creditButtonNode: 0,
+            cashRadioNode: 0,
+            cashButtonNode: 0
+        };
 
         const domObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
-                const creditRadioParentDiv = document.getElementsByClassName("bat-form-field bat-form--cashondelivery-payment-credit-card-header")[0];
-                const creditRadio = creditRadioParentDiv.querySelector(`input`);
+                if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']")) {
+                    countObj.creditRadioNode++;
+                }
             });
-            addButtonFn();
-            afterLoadingFn();
-            domObserver.disconnect();
+            mutations.forEach(mutation => {
+                if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
+                    countObj.creditButtonNode++;
+                }
+            });
+            mutations.forEach(mutation => {
+                if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
+                    countObj.cashRadioNode++;
+                }
+            });
+            mutations.forEach(mutation => {
+                if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
+                    countObj.cashButtonNode++;
+                }
+            });
+
+            if (Object.values(countObj).every(count => count > 0)) {
+                console.log("", countObj);
+                addButtonFn();
+                afterLoadingFn();
+                domObserver.disconnect();
+            }
         });
 
         domObserver.observe(target, {
