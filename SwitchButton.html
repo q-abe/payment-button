@@ -11,25 +11,30 @@
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']")) {
                 countObj.creditRadioNode++;
+                console.log("creditRadioNode rendered");
             }
         });
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
                 countObj.creditButtonNode++;
+                console.log("creditButtonNode rendered");
             }
         });
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
                 countObj.cashRadioNode++;
+                console.log("cashRadioNode rendered");
             }
         });
         mutations.forEach(mutation => {
             if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
                 countObj.cashButtonNode++;
+                console.log("cashButtonNode rendered");
             }
         });
 
         if (Object.values(countObj).every(count => count > 0)) {
+            console.log("all targets rendered");
             domObserver.disconnect();
             addButtonFn();
             afterLoadingFn();
@@ -55,6 +60,7 @@
                 </div>`;
 
         addTarget.insertAdjacentHTML("afterend", addButton);
+        console.log("copyButton added");
     };
 
     const afterLoadingFn = () => {
@@ -75,6 +81,7 @@
                 copiedCredit.classList.remove("hidden");
                 copiedCash.classList.add("hidden");
                 initialButton.classList.add("hidden");
+                console.log("switch to creditButton");
             });
 
             //支払いを代引きにしたとき、クレジットの購入確定ボタンを非表示にする
@@ -82,18 +89,21 @@
                 copiedCredit.classList.add("hidden");
                 copiedCash.classList.remove("hidden");
                 initialButton.classList.add("hidden");
+                console.log("switch to cashButton");
             });
 
             //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
             copiedCredit.addEventListener("click", () => {
                 const clickEvent = new Event("click");
                 creditOriginButton.dispatchEvent(clickEvent);
+                console.log("credit settlement");
             });
 
             //代引きの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
             copiedCash.addEventListener("click", () => {
                 const clickEvent = new Event("click");
                 cashOriginButton.click();
+                console.log("cash settlement");
             });
 
             //監視オブジェクトのインスタンス化
@@ -103,8 +113,10 @@
                     //クレジットの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
                     if (disableValue === "" || disableValue === "disabled") {
                         copiedCredit.classList.add("disabled");
+                        console.log("creditButton disabled");
                     } else {
                         copiedCredit.classList.remove("disabled");
+                        console.log("creditButton enabled");
                     }
                 });
             });
@@ -120,8 +132,10 @@
                     //代引きの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
                     if (record.target.classList.contains("disabled")) {
                         copiedCash.classList.add("disabled");
+                        console.log("cashButton disabled");
                     } else {
                         copiedCash.classList.remove("disabled");
+                        console.log("cashButton enabled");
                     }
                 });
             });
