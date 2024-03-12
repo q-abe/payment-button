@@ -1,5 +1,11 @@
 <script>
     const target = document.querySelector(".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment");
+
+    const creditRadioQuery = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
+    const cashRadioQuery = ".cashondelivery-method-section input[name='creditCardHeader']";
+    const creditButtonQuery = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
+    const cashButtonQuery = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
+
     const countObj = {
         creditRadioNode: false,
         creditButtonNode: false,
@@ -9,19 +15,19 @@
 
     const domObserver = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
-            if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']")) {
+            if (mutation.target.querySelector(creditRadioQuery)) {
                 countObj.creditRadioNode = true;
                 console.log("creditRadioNode rendered");
             }
-            if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
+            if (mutation.target.querySelector(creditButtonQuery)) {
                 countObj.creditButtonNode = true;
                 console.log("creditButtonNode rendered");
             }
-            if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
+            if (mutation.target.querySelector(cashRadioQuery)) {
                 countObj.cashRadioNode = true;
                 console.log("cashRadioNode rendered");
             }
-            if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
+            if (mutation.target.querySelector(cashButtonQuery)) {
                 countObj.cashButtonNode = true;
                 console.log("cashButtonNode rendered");
             }
@@ -62,10 +68,10 @@
         const copiedCash = document.querySelector("#copiedCash");
         const initialButton = document.querySelector("#initialButton");
 
-        const creditRadio = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']");
-        const cashRadio = document.querySelector(".cashondelivery-method-section input[name='creditCardHeader']");
-        const creditOriginButton = document.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']");
-        const cashOriginButton = document.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']");
+        const creditRadio = document.querySelector(creditRadioQuery);
+        const cashRadio = document.querySelector(cashRadioQuery);
+        const creditOriginButton = document.querySelector(creditButtonQuery);
+        const cashOriginButton = document.querySelector(cashButtonQuery);
 
         if (copiedCredit && copiedCash && initialButton) {
             /**
