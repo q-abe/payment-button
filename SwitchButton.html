@@ -13,20 +13,14 @@
                 countObj.creditRadioNode = true;
                 console.log("creditRadioNode rendered");
             }
-        });
-        mutations.forEach(mutation => {
             if (mutation.target.querySelector(".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']")) {
                 countObj.creditButtonNode = true;
                 console.log("creditButtonNode rendered");
             }
-        });
-        mutations.forEach(mutation => {
             if (mutation.target.querySelector(".cashondelivery-method-section input[name='creditCardHeader']")) {
                 countObj.cashRadioNode = true;
                 console.log("cashRadioNode rendered");
             }
-        });
-        mutations.forEach(mutation => {
             if (mutation.target.querySelector(".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']")) {
                 countObj.cashButtonNode = true;
                 console.log("cashButtonNode rendered");
