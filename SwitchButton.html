@@ -20,13 +20,13 @@
             cashRadioNode: false,
             cashButtonNode: false
         };
-        const domObserver = new MutationObserver(mutations => {
             const checkNodeRendered = (mutation, query, prop) => {
                 if (mutation.target.querySelector(query)) {
                     hasNode[prop] = true;
                     console.log(`${prop} rendered`);
                 }
             };
+        const domObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 checkNodeRendered(mutation, creditRadioQuery, "creditRadioNode");
                 checkNodeRendered(mutation, creditButtonQuery, "creditButtonNode");
