@@ -6,45 +6,41 @@
     const creditButtonQuery = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
     const cashButtonQuery = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
 
-    const countObj = {
-        creditRadioNode: false,
-        creditButtonNode: false,
-        cashRadioNode: false,
-        cashButtonNode: false
-    };
-
-    const domObserver = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            if (mutation.target.querySelector(creditRadioQuery)) {
-                countObj.creditRadioNode = true;
-                console.log("creditRadioNode rendered");
-            }
-            if (mutation.target.querySelector(creditButtonQuery)) {
-                countObj.creditButtonNode = true;
-                console.log("creditButtonNode rendered");
-            }
-            if (mutation.target.querySelector(cashRadioQuery)) {
-                countObj.cashRadioNode = true;
-                console.log("cashRadioNode rendered");
-            }
-            if (mutation.target.querySelector(cashButtonQuery)) {
-                countObj.cashButtonNode = true;
-                console.log("cashButtonNode rendered");
+    const hasNodeObserver = () => {
+        const hasNode = {
+            creditRadioNode: false,
+            creditButtonNode: false,
+            cashRadioNode: false,
+            cashButtonNode: false
+        };
+        const domObserver = new MutationObserver(mutations => {
+            const checkNodeRendered = (mutation, query, prop) => {
+                if (mutation.target.querySelector(query)) {
+                    hasNode[prop] = true;
+                    console.log(`${prop} rendered`);
+                }
+            };
+            mutations.forEach(mutation => {
+                checkNodeRendered(mutation, creditRadioQuery, "creditRadioNode");
+                checkNodeRendered(mutation, creditButtonQuery, "creditButtonNode");
+                checkNodeRendered(mutation, cashRadioQuery, "cashRadioNode");
+                checkNodeRendered(mutation, cashButtonQuery, "cashButtonNode");
+            });
+            if (Object.values(hasNode).every(count => count)) {
+                console.log("all targets rendered");
+                domObserver.disconnect();
+                addButtonFn();
+                afterLoadingFn();
             }
         });
+        domObserver.observe(target, {
+            childList: true,
+            subtree: true
+        });
+    };
 
-        if (Object.values(countObj).every(count => count)) {
-            console.log("all targets rendered");
-            domObserver.disconnect();
-            addButtonFn();
-            afterLoadingFn();
-        }
-    });
+    hasNodeObserver();
 
-    domObserver.observe(target, {
-        childList: true,
-        subtree: true
-    });
 
     const addButtonFn = () => {
         const addTarget = document.getElementById("cashondeliveryForm");
