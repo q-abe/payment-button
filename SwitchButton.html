@@ -15,10 +15,10 @@
 
     const hasNodeObserver = () => {
         const hasNode = {
-            creditRadio: false,
-            creditButton: false,
-            cashRadio: false,
-            cashButton: false
+            creditRadio: undefined,
+            creditButton: undefined,
+            cashRadio: undefined,
+            cashButton: undefined
         };
         const queries = {
             creditRadio: creditRadioQuery,
@@ -30,7 +30,7 @@
         const checkNodeRendered = (mutation) => {
             Object.keys(queries).forEach(queryKey => {
                 if (mutation.target.querySelector(queries[queryKey])) {
-                    hasNode[queryKey] = true;
+                    hasNode[queryKey] = mutation.target.querySelector(queries[queryKey]);
                     console.log(`${queryKey}Node rendered`);
                 }
             });
@@ -41,7 +41,7 @@
                 console.log("observe disconnected");
                 console.log("all targets rendered");
                 addElementsFn(justBeforeQuery, "afterend", addButton);
-                afterLoadingFn();
+                afterLoadingFn(hasNode);
             }
         };
         const domObserver = new MutationObserver(mutations => {
@@ -66,21 +66,16 @@
         console.log(`Element is added at the ${position}`);
     };
 
-    const afterLoadingFn = () => {
+    const afterLoadingFn = (hasNodes) => {
         const copiedCredit = document.querySelector(copiedCreditQuery);
         const copiedCash = document.querySelector(copiedCashQuery);
         const initialButton = document.querySelector(initialButtonQuery);
-
-        const creditRadio = document.querySelector(creditRadioQuery);
-        const cashRadio = document.querySelector(cashRadioQuery);
-        const creditOriginButton = document.querySelector(creditButtonQuery);
-        const cashOriginButton = document.querySelector(cashButtonQuery);
 
         if (copiedCredit && copiedCash && initialButton) {
             /**
              *支払いをクレジットにしたとき、代引きの購入確定ボタンを非表示にする
              */
-            creditRadio.addEventListener("change", () => {
+            hasNodes.creditRadio.addEventListener("change", () => {
                 copiedCredit.classList.remove("hidden");
                 copiedCash.classList.add("hidden");
                 initialButton.classList.add("hidden");
@@ -88,7 +83,7 @@
             });
 
             //支払いを代引きにしたとき、クレジットの購入確定ボタンを非表示にする
-            cashRadio.addEventListener("change", () => {
+            hasNodes.cashRadio.addEventListener("change", () => {
                 copiedCredit.classList.add("hidden");
                 copiedCash.classList.remove("hidden");
                 initialButton.classList.add("hidden");
@@ -98,14 +93,14 @@
             //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
             copiedCredit.addEventListener("click", () => {
                 const clickEvent = new Event("click");
-                creditOriginButton.dispatchEvent(clickEvent);
+                hasNodes.creditButton.dispatchEvent(clickEvent);
                 console.log("credit settlement");
             });
 
             //代引きの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
             copiedCash.addEventListener("click", () => {
                 const clickEvent = new Event("click");
-                cashOriginButton.click();
+                hasNodes.cashButton.click();
                 console.log("cash settlement");
             });
 
@@ -125,7 +120,7 @@
             });
 
             //監視オブジェクトによる監視開始(クレジット購入ボタンの属性の変化)
-            creditObserver.observe(creditOriginButton, {
+            creditObserver.observe(hasNodes.creditButton, {
                 attributes: true
             });
 
@@ -144,7 +139,7 @@
             });
 
             //監視オブジェクトによる監視開始(代引き購入ボタンのクラス属性の変化)
-            cashObserver.observe(cashOriginButton, {
+            cashObserver.observe(hasNodes.cashButton, {
                 attributes: true,
                 attributeFilter: ["class"]
             });
