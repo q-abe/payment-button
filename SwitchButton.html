@@ -36,7 +36,7 @@
             if (Object.values(hasNode).every(count => count)) {
                 console.log("all targets rendered");
                 domObserver.disconnect();
-                addButtonFn();
+                addElementsFn(justBeforeQuery, "afterend", addButton);
                 afterLoadingFn();
             }
         });
@@ -50,10 +50,10 @@
     hasNodeObserver();
 
 
-    const addButtonFn = () => {
-        const addTarget = document.querySelector(justBeforeQuery);
-        addTarget.insertAdjacentHTML("afterend", addButton);
-        console.log("copyButton added");
+    const addElementsFn = (query, position, element) => {
+        const addTarget = document.querySelector(query);
+        addTarget.insertAdjacentHTML(position, element);
+        console.log(`Element is added at the ${position}`);
     };
 
     const afterLoadingFn = () => {
