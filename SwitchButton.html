@@ -15,30 +15,40 @@
 
     const hasNodeObserver = () => {
         const hasNode = {
-            creditRadioNode: false,
-            creditButtonNode: false,
-            cashRadioNode: false,
-            cashButtonNode: false
+            creditRadio: false,
+            creditButton: false,
+            cashRadio: false,
+            cashButton: false
         };
-            const checkNodeRendered = (mutation, query, prop) => {
-                if (mutation.target.querySelector(query)) {
-                    hasNode[prop] = true;
-                    console.log(`${prop} rendered`);
+        const queries = {
+            creditRadio: creditRadioQuery,
+            creditButton: creditButtonQuery,
+            cashRadio: cashRadioQuery,
+            cashButton: cashButtonQuery
+        };
+
+        const checkNodeRendered = (mutation) => {
+            Object.keys(queries).forEach(queryKey => {
+                if (mutation.target.querySelector(queries[queryKey])) {
+                    hasNode[queryKey] = true;
+                    console.log(`${queryKey}Node rendered`);
                 }
-            };
-        const domObserver = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                checkNodeRendered(mutation, creditRadioQuery, "creditRadioNode");
-                checkNodeRendered(mutation, creditButtonQuery, "creditButtonNode");
-                checkNodeRendered(mutation, cashRadioQuery, "cashRadioNode");
-                checkNodeRendered(mutation, cashButtonQuery, "cashButtonNode");
             });
+        };
+        const checkNodesRendered = () => {
             if (Object.values(hasNode).every(count => count)) {
-                console.log("all targets rendered");
                 domObserver.disconnect();
+                console.log("observe disconnected");
+                console.log("all targets rendered");
                 addElementsFn(justBeforeQuery, "afterend", addButton);
                 afterLoadingFn();
             }
+        };
+        const domObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                checkNodeRendered(mutation);
+            });
+            checkNodesRendered();
         });
         const targetOfParent = document.querySelector(targetOfParentQuery);
         domObserver.observe(targetOfParent, {
@@ -59,7 +69,7 @@
     const afterLoadingFn = () => {
         const copiedCredit = document.querySelector(copiedCreditQuery);
         const copiedCash = document.querySelector(copiedCashQuery);
-        const initialButton = document.querySelector(initialButtonQuery)
+        const initialButton = document.querySelector(initialButtonQuery);
 
         const creditRadio = document.querySelector(creditRadioQuery);
         const cashRadio = document.querySelector(cashRadioQuery);
