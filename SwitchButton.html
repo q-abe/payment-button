@@ -1,10 +1,17 @@
 <script>
-    const target = document.querySelector(".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment");
+    const targetOfParentQuery = ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment";
 
     const creditRadioQuery = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
     const cashRadioQuery = ".cashondelivery-method-section input[name='creditCardHeader']";
     const creditButtonQuery = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
     const cashButtonQuery = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
+
+    const addButton = `<div><button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button></div>`;
+    const justBeforeQuery = "#cashondeliveryForm";
+
+    const copiedCreditQuery = "#copiedCredit";
+    const copiedCashQuery = "#copiedCash";
+    const initialButtonQuery = "#initialButton";
 
     const hasNodeObserver = () => {
         const hasNode = {
@@ -33,7 +40,8 @@
                 afterLoadingFn();
             }
         });
-        domObserver.observe(target, {
+        const targetOfParent = document.querySelector(targetOfParentQuery);
+        domObserver.observe(targetOfParent, {
             childList: true,
             subtree: true
         });
@@ -43,26 +51,15 @@
 
 
     const addButtonFn = () => {
-        const addTarget = document.getElementById("cashondeliveryForm");
-        const addButton = `
-                <div>
-                    <button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button>
-                </div>
-                <div>
-                    <button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button>
-                </div>
-                <div>
-                    <button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button>
-                </div>`;
-
+        const addTarget = document.querySelector(justBeforeQuery);
         addTarget.insertAdjacentHTML("afterend", addButton);
         console.log("copyButton added");
     };
 
     const afterLoadingFn = () => {
-        const copiedCredit = document.querySelector("#copiedCredit");
-        const copiedCash = document.querySelector("#copiedCash");
-        const initialButton = document.querySelector("#initialButton");
+        const copiedCredit = document.querySelector(copiedCreditQuery);
+        const copiedCash = document.querySelector(copiedCashQuery);
+        const initialButton = document.querySelector(initialButtonQuery)
 
         const creditRadio = document.querySelector(creditRadioQuery);
         const cashRadio = document.querySelector(cashRadioQuery);
