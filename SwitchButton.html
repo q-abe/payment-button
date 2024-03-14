@@ -1,19 +1,23 @@
 <script>
-    const targetOfParentQuery = ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment";
+    const TARGET_OF_PARENT_QUERY = ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment";
 
     const creditRadioQuery = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
     const cashRadioQuery = ".cashondelivery-method-section input[name='creditCardHeader']";
     const creditButtonQuery = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
     const cashButtonQuery = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
+    const CREDIT_RADIO_QUERY = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
+    const CASH_RADIO_QUERY = ".cashondelivery-method-section input[name='creditCardHeader']";
+    const CREDIT_BUTTON_QUERY = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
+    const CASH_BUTTON_QUERY = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
 
-    const addButton = `<div><button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button></div>`;
-    const justBeforeQuery = "#cashondeliveryForm";
+    const COPY_BUTTON_NODE = `<div><button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button></div>`;
+    const ADD_BTN_JUST_BEFORE_QUERY = "#cashondeliveryForm";
 
     const copiedCreditQuery = "#copiedCredit";
     const copiedCashQuery = "#copiedCash";
     const initialButtonQuery = "#initialButton";
 
-    const hasNodeObserver = () => {
+    const startObserveDomRendered = () => {
         const hasNode = {
             creditRadio: undefined,
             creditButton: undefined,
@@ -21,44 +25,41 @@
             cashButton: undefined
         };
         const queries = {
-            creditRadio: creditRadioQuery,
-            creditButton: creditButtonQuery,
-            cashRadio: cashRadioQuery,
-            cashButton: cashButtonQuery
+            creditRadio: CREDIT_RADIO_QUERY,
+            creditButton: CREDIT_BUTTON_QUERY,
+            cashRadio: CASH_RADIO_QUERY,
+            cashButton: CASH_BUTTON_QUERY
         };
 
-        const checkNodeRendered = (mutation) => {
+        const checkNodesRendered = (node) => {
             Object.keys(queries).forEach(queryKey => {
-                if (mutation.target.querySelector(queries[queryKey])) {
-                    hasNode[queryKey] = mutation.target.querySelector(queries[queryKey]);
+                if (node.target.querySelector(queries[queryKey])) {
+                    hasNode[queryKey] = node.target.querySelector(queries[queryKey]);
                     console.log(`${queryKey}Node rendered`);
                 }
             });
         };
-        const checkNodesRendered = () => {
+        const hasAllNodes = () => {
             if (Object.values(hasNode).every(count => count)) {
-                domObserver.disconnect();
+                targetOfParentObserver.disconnect();
                 console.log("observe disconnected");
                 console.log("all targets rendered");
-                addElementsFn(justBeforeQuery, "afterend", addButton);
+                addElementsFn(ADD_BTN_JUST_BEFORE_QUERY, "afterend", COPY_BUTTON_NODE);
                 afterLoadingFn(hasNode);
             }
         };
-        const domObserver = new MutationObserver(mutations => {
+        const targetOfParentObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
-                checkNodeRendered(mutation);
+                checkNodesRendered(mutation);
             });
-            checkNodesRendered();
+            hasAllNodes();
         });
-        const targetOfParent = document.querySelector(targetOfParentQuery);
-        domObserver.observe(targetOfParent, {
+        const targetOfParent = document.querySelector(TARGET_OF_PARENT_QUERY);
+        targetOfParentObserver.observe(targetOfParent, {
             childList: true,
             subtree: true
         });
     };
-
-    hasNodeObserver();
-
 
     const addElementsFn = (query, position, element) => {
         const addTarget = document.querySelector(query);
@@ -147,6 +148,9 @@
             console.log("変数ないよ");
         }
     };
+
+    startObserveDomRendered();
+
 </script>
 
 <style>
