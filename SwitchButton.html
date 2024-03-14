@@ -43,13 +43,28 @@
         });
     };
 
-    const imitateRadioAction = (targetNode, {displayNodes,hideNodes}) => {
+    const imitateRadioAction = (targetNode, {displayNodes, hideNodes}) => {
         const changedKeysName = {
             addNodes: displayNodes,
             removeNodes: hideNodes
         };
         setChangeAction(targetNode, () => {
             toggleHiddenClasses(changedKeysName);
+        });
+    };
+
+    const SynchronizationEvent = (node, callback) => {
+        node.addEventListener("click", callback);
+    };
+
+    const copiedClickEvent = (origin) => {
+        const clickEvent = new Event("click");
+        origin.click();
+    };
+
+    const syncClickEvent = (copied, origin) => {
+        SynchronizationEvent(copied, () => {
+            copiedClickEvent(origin);
         });
     };
 
@@ -124,19 +139,11 @@
                 }
             );
 
-            //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
-            copiedCredit.addEventListener("click", () => {
-                const clickEvent = new Event("click");
-                hasNodes.creditButton.dispatchEvent(clickEvent);
-                console.log("credit settlement");
-            });
-
-            //代引きの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
-            copiedCash.addEventListener("click", () => {
-                const clickEvent = new Event("click");
-                hasNodes.cashButton.click();
-                console.log("cash settlement");
-            });
+            /**
+             * コピーボタンをクリックしたときにオリジナルのボタンをクリックする。
+             */
+            syncClickEvent(copiedCredit, hasNodes.creditButton);
+            syncClickEvent(copiedCash, hasNodes.cashButton);
 
             //監視オブジェクトのインスタンス化
             const creditObserver = new MutationObserver(mutations => {
