@@ -1,10 +1,6 @@
 <script>
     const TARGET_OF_PARENT_QUERY = ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment";
 
-    const creditRadioQuery = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
-    const cashRadioQuery = ".cashondelivery-method-section input[name='creditCardHeader']";
-    const creditButtonQuery = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
-    const cashButtonQuery = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
     const CREDIT_RADIO_QUERY = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
     const CASH_RADIO_QUERY = ".cashondelivery-method-section input[name='creditCardHeader']";
     const CREDIT_BUTTON_QUERY = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
@@ -13,9 +9,39 @@
     const COPY_BUTTON_NODE = `<div><button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button></div>`;
     const ADD_BTN_JUST_BEFORE_QUERY = "#cashondeliveryForm";
 
+    const HIDDEN_CLASS = "hidden";
+
     const copiedCreditQuery = "#copiedCredit";
     const copiedCashQuery = "#copiedCash";
     const initialButtonQuery = "#initialButton";
+
+    /**
+     *対象のNodeに変化が起きたらcallback関数を実行する。
+     */
+    const setChangeAction = (node, callback) => {
+        node.addEventListener("change", callback);
+    };
+
+    /**
+     *受け取ったプロパティによってHiddenを追加、削除する。
+     */
+    const setHiddenClass = (node, property) => {
+        const isAdd = property === "add";
+        isAdd ? node.classList.add(HIDDEN_CLASS)
+            : node.classList.remove(HIDDEN_CLASS);
+    };
+
+    /**
+     *受け取った追加や削除したい対象の配列を取り出す。
+     */
+    const toggleHiddenClasses = ({addNodes, removeNodes}) => {
+        addNodes.forEach(addNode => {
+            setHiddenClass(addNode, "add");
+        });
+        removeNodes.forEach(removeNode => {
+            setHiddenClass(removeNode, "remove");
+        });
+    };
 
     const startObserveDomRendered = () => {
         const hasNode = {
@@ -74,21 +100,24 @@
 
         if (copiedCredit && copiedCash && initialButton) {
             /**
-             *支払いをクレジットにしたとき、代引きの購入確定ボタンを非表示にする
+             *支払いを選択したとき、非選択の購入確定ボタンを非表示にする
              */
-            hasNodes.creditRadio.addEventListener("change", () => {
-                copiedCredit.classList.remove("hidden");
-                copiedCash.classList.add("hidden");
-                initialButton.classList.add("hidden");
-                console.log("switch to creditButton");
+            setChangeAction(hasNodes.creditRadio, () => {
+                toggleHiddenClasses(
+                    {
+                        addNodes: [copiedCash, initialButton],
+                        removeNodes: [copiedCredit]
+                    }
+                );
             });
 
-            //支払いを代引きにしたとき、クレジットの購入確定ボタンを非表示にする
-            hasNodes.cashRadio.addEventListener("change", () => {
-                copiedCredit.classList.add("hidden");
-                copiedCash.classList.remove("hidden");
-                initialButton.classList.add("hidden");
-                console.log("switch to cashButton");
+            setChangeAction(hasNodes.cashRadio, () => {
+                toggleHiddenClasses(
+                    {
+                        addNodes: [copiedCredit, initialButton],
+                        removeNodes: [copiedCash]
+                    }
+                );
             });
 
             //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
