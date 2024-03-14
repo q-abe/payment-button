@@ -10,6 +10,7 @@
     const ADD_BTN_JUST_BEFORE_QUERY = "#cashondeliveryForm";
 
     const HIDDEN_CLASS = "hidden";
+    const DISABLED_CLASS = "disabled";
 
     const copiedCreditQuery = "#copiedCredit";
     const copiedCashQuery = "#copiedCash";
@@ -65,6 +66,32 @@
     const syncClickEvent = (copied, origin) => {
         SynchronizationEvent(copied, () => {
             copiedClickEvent(origin);
+        });
+    };
+
+    //判定次第で非活性　引数は判定結果とコピーボタン
+    const syncStateButton = (isDisabled, copiedNode) => {
+        isDisabled ? copiedNode.classList.add(DISABLED_CLASS)
+            : copiedNode.classList.remove(DISABLED_CLASS);
+    };
+
+    //someBoolean 　引数はmutationと条件
+    const checkToDisabled = (node) => {
+        const isDisabled = [node.target.getAttribute(DISABLED_CLASS) !== null, node.target.classList.contains(DISABLED_CLASS)];
+        return isDisabled.some(isDisabled => isDisabled);
+    };
+
+
+    //監視開始　引数は条件とコピーボタン
+    const copiedSyncToOrigin = (targetNode, copiedNode) => {
+        const nodeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                const isDisabled = checkToDisabled(mutation);
+                syncStateButton(isDisabled, copiedNode);
+            });
+        });
+        nodeObserver.observe(targetNode, {
+            attributes: true
         });
     };
 
@@ -132,8 +159,7 @@
                     hideNodes: [copiedCredit]
                 }
             );
-            imitateRadioAction(hasNodes.cashRadio,
-                {
+            imitateRadioAction(hasNodes.cashRadio, {
                     displayNodes: [copiedCredit, initialButton],
                     hideNodes: [copiedCash]
                 }
@@ -145,47 +171,11 @@
             syncClickEvent(copiedCredit, hasNodes.creditButton);
             syncClickEvent(copiedCash, hasNodes.cashButton);
 
-            //監視オブジェクトのインスタンス化
-            const creditObserver = new MutationObserver(mutations => {
-                mutations.forEach((record) => {
-                    const disableValue = record.target.getAttribute("disabled");
-                    //クレジットの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
-                    if (disableValue === "" || disableValue === "disabled") {
-                        copiedCredit.classList.add("disabled");
-                        console.log("creditButton disabled");
-                    } else {
-                        copiedCredit.classList.remove("disabled");
-                        console.log("creditButton enabled");
-                    }
-                });
-            });
-
-            //監視オブジェクトによる監視開始(クレジット購入ボタンの属性の変化)
-            creditObserver.observe(hasNodes.creditButton, {
-                attributes: true
-            });
-
-            //監視オブジェクトのインスタンス化
-            const cashObserver = new MutationObserver(mutations => {
-                mutations.forEach((record) => {
-                    //代引きの購入ボタンが活性状態のとき、コピーボタンを活性状態にする
-                    if (record.target.classList.contains("disabled")) {
-                        copiedCash.classList.add("disabled");
-                        console.log("cashButton disabled");
-                    } else {
-                        copiedCash.classList.remove("disabled");
-                        console.log("cashButton enabled");
-                    }
-                });
-            });
-
-            //監視オブジェクトによる監視開始(代引き購入ボタンのクラス属性の変化)
-            cashObserver.observe(hasNodes.cashButton, {
-                attributes: true,
-                attributeFilter: ["class"]
-            });
-        } else {
-            console.log("変数ないよ");
+            /**
+             * オリジナルのボタンの活性状態を同期する。
+             */
+            copiedSyncToOrigin(hasNodes.creditButton, copiedCredit);
+            copiedSyncToOrigin(hasNodes.cashButton, copiedCash);
         }
     };
 
