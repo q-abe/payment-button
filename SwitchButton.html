@@ -43,6 +43,16 @@
         });
     };
 
+    const imitateRadioAction = (targetNode, {displayNodes,hideNodes}) => {
+        const changedKeysName = {
+            addNodes: displayNodes,
+            removeNodes: hideNodes
+        };
+        setChangeAction(targetNode, () => {
+            toggleHiddenClasses(changedKeysName);
+        });
+    };
+
     const startObserveDomRendered = () => {
         const hasNode = {
             creditRadio: undefined,
@@ -102,23 +112,17 @@
             /**
              *支払いを選択したとき、非選択の購入確定ボタンを非表示にする
              */
-            setChangeAction(hasNodes.creditRadio, () => {
-                toggleHiddenClasses(
-                    {
-                        addNodes: [copiedCash, initialButton],
-                        removeNodes: [copiedCredit]
-                    }
-                );
-            });
-
-            setChangeAction(hasNodes.cashRadio, () => {
-                toggleHiddenClasses(
-                    {
-                        addNodes: [copiedCredit, initialButton],
-                        removeNodes: [copiedCash]
-                    }
-                );
-            });
+            imitateRadioAction(hasNodes.creditRadio, {
+                    displayNodes: [copiedCash, initialButton],
+                    hideNodes: [copiedCredit]
+                }
+            );
+            imitateRadioAction(hasNodes.cashRadio,
+                {
+                    displayNodes: [copiedCredit, initialButton],
+                    hideNodes: [copiedCash]
+                }
+            );
 
             //クレジットの購入ボタンをクリックしたとき、オリジナルボタンをクリックする
             copiedCredit.addEventListener("click", () => {
