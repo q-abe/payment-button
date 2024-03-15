@@ -11,6 +11,11 @@
 
     const HIDDEN_CLASS = "hidden";
     const DISABLED_CLASS = "disabled";
+    const CHANGE = "change";
+    const CLICK = "click";
+    const AFTER_END = "afterend";
+    const ADD = "add";
+    const REMOVE = "remove";
 
     const copiedCreditQuery = "#copiedCredit";
     const copiedCashQuery = "#copiedCash";
@@ -20,14 +25,14 @@
      *対象のNodeに変化が起きたらcallback関数を実行する。
      */
     const setChangeAction = (node, callback) => {
-        node.addEventListener("change", callback);
+        node.addEventListener(CHANGE, callback);
     };
 
     /**
      *受け取ったプロパティによってHiddenを追加、削除する。
      */
     const setHiddenClass = (node, property) => {
-        const isAdd = property === "add";
+        const isAdd = property === ADD;
         isAdd ? node.classList.add(HIDDEN_CLASS)
             : node.classList.remove(HIDDEN_CLASS);
     };
@@ -37,13 +42,16 @@
      */
     const toggleHiddenClasses = ({addNodes, removeNodes}) => {
         addNodes.forEach(addNode => {
-            setHiddenClass(addNode, "add");
+            setHiddenClass(addNode, ADD);
         });
         removeNodes.forEach(removeNode => {
-            setHiddenClass(removeNode, "remove");
+            setHiddenClass(removeNode, REMOVE);
         });
     };
 
+    /**
+     *Radioの切り替えに応じて表示ボタンを真似する。
+     */
     const imitateRadioAction = (targetNode, {displayNodes, hideNodes}) => {
         const changedKeysName = {
             addNodes: displayNodes,
@@ -54,35 +62,50 @@
         });
     };
 
+    /**
+     *クリックイベントによるcallback関数の実行。
+     */
     const SynchronizationEvent = (node, callback) => {
-        node.addEventListener("click", callback);
+        node.addEventListener(CLICK, callback);
     };
 
+    /**
+     *オリジナルボタンのクリック。
+     */
     const copiedClickEvent = (origin) => {
-        const clickEvent = new Event("click");
+        const clickEvent = new Event(CLICK);
         origin.click();
     };
 
+    /**
+     *イベントリスナーの呼び出し。
+     */
     const syncClickEvent = (copied, origin) => {
         SynchronizationEvent(copied, () => {
             copiedClickEvent(origin);
         });
     };
 
-    //判定次第で非活性　引数は判定結果とコピーボタン
+    /**
+     * 判定次第でdisableの切り替え。
+     */
     const syncStateButton = (isDisabled, copiedNode) => {
         isDisabled ? copiedNode.classList.add(DISABLED_CLASS)
             : copiedNode.classList.remove(DISABLED_CLASS);
     };
 
-    //someBoolean 　引数はmutationと条件
+    /**
+     * 条件一致の判定。(いずれかがtrue)
+     */
     const checkToDisabled = (node) => {
         const isDisabled = [node.target.getAttribute(DISABLED_CLASS) !== null, node.target.classList.contains(DISABLED_CLASS)];
         return isDisabled.some(isDisabled => isDisabled);
     };
 
 
-    //監視開始　引数は条件とコピーボタン
+    /**
+     * 条件一致の判定。(いずれかがtrue)
+     */
     const copiedSyncToOrigin = (targetNode, copiedNode) => {
         const nodeObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -109,6 +132,9 @@
             cashButton: CASH_BUTTON_QUERY
         };
 
+        /**
+         * 対象のNodeが存在すればオブジェクトを更新。
+         */
         const checkNodesRendered = (node) => {
             Object.keys(queries).forEach(queryKey => {
                 if (node.target.querySelector(queries[queryKey])) {
@@ -117,15 +143,23 @@
                 }
             });
         };
+
+        /**
+         * 全ての対象Nodeが取得できたか判定。
+         */
         const hasAllNodes = () => {
             if (Object.values(hasNode).every(count => count)) {
                 targetOfParentObserver.disconnect();
-                console.log("observe disconnected");
+                console.log("targetOfParentObserver disconnected");
                 console.log("all targets rendered");
-                addElementsFn(ADD_BTN_JUST_BEFORE_QUERY, "afterend", COPY_BUTTON_NODE);
+                addElementsFn(ADD_BTN_JUST_BEFORE_QUERY, AFTER_END, COPY_BUTTON_NODE);
                 afterLoadingFn(hasNode);
             }
         };
+
+        /**
+         * 対象の親Nodeの監視。
+         */
         const targetOfParentObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 checkNodesRendered(mutation);
@@ -139,6 +173,9 @@
         });
     };
 
+    /**
+     * Elementの追加。
+     */
     const addElementsFn = (query, position, element) => {
         const addTarget = document.querySelector(query);
         addTarget.insertAdjacentHTML(position, element);
