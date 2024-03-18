@@ -1,0 +1,279 @@
+<script>
+    const QUERIES = {
+        TARGET_OF_PARENT: ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment",
+        CREDIT_RADIO: ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']",
+        CASH_RADIO: ".cashondelivery-method-section input[name='creditCardHeader']",
+        CREDIT_BTN: ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']",
+        CASH_BTN: ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']",
+        ADD_BTN_JUST_BEFORE: "#cashondeliveryForm",
+        COPIED_CREDIT_BTN: "#copiedCredit",
+        COPIED_CASH_BTN: "#copiedCash",
+        INITIAL_BTN: "#initialButton"
+    };
+
+    const CLASS = {
+        HIDDEN: "hidden",
+        DISABLED: "disabled"
+    };
+
+    const EVENT = {
+        CHANGE: "change",
+        CLICK: "click",
+        AFTER_END: "afterend",
+        ADD: "add",
+        REMOVE: "remove"
+    };
+
+    /**
+     *対象のNodeに変化が起きたらcallback関数を実行する。
+     */
+    const setChangeAction = (node, callback) => {
+        node.addEventListener(EVENT.CHANGE, callback);
+    };
+
+    /**
+     *受け取ったプロパティによってHiddenを追加、削除する。
+     */
+    const setHiddenClass = (node, property) => {
+        const isAdd = property === EVENT.ADD;
+        isAdd ? node.classList.add(CLASS.HIDDEN)
+            : node.classList.remove(CLASS.HIDDEN);
+    };
+
+    /**
+     *受け取った追加や削除したい対象の配列を取り出す。
+     */
+    const toggleHiddenClasses = ({addNodes, removeNodes}) => {
+        addNodes.forEach(addNode => {
+            setHiddenClass(addNode, EVENT.ADD);
+        });
+        removeNodes.forEach(removeNode => {
+            setHiddenClass(removeNode, EVENT.REMOVE);
+        });
+    };
+
+    /**
+     *Radioの切り替えに応じて表示ボタンを真似する。
+     */
+    const imitateRadioAction = (targetNode, {displayNodes, hideNodes}) => {
+        const changedKeysName = {
+            addNodes: displayNodes,
+            removeNodes: hideNodes
+        };
+        setChangeAction(targetNode, () => {
+            toggleHiddenClasses(changedKeysName);
+        });
+    };
+
+    /**
+     *クリックイベントによるcallback関数の実行。
+     */
+    const SynchronizationEvent = (node, callback) => {
+        node.addEventListener(EVENT.CLICK, callback);
+    };
+
+    /**
+     *オリジナルボタンのクリック。
+     */
+    const copiedClickEvent = (origin) => {
+        const clickEvent = new Event(EVENT.CLICK);
+        origin.click();
+    };
+
+    /**
+     *イベントリスナーの呼び出し。
+     */
+    const syncClickEvent = (copied, origin) => {
+        SynchronizationEvent(copied, () => {
+            copiedClickEvent(origin);
+        });
+    };
+
+    /**
+     * 判定次第でdisableの切り替え。
+     */
+    const syncStateButton = (isDisabled, copiedNode) => {
+        isDisabled ? copiedNode.classList.add(CLASS.DISABLED)
+            : copiedNode.classList.remove(CLASS.DISABLED);
+    };
+
+    /**
+     * 条件一致の判定。(いずれかがtrue)
+     */
+    const checkToDisabled = (node) => {
+        const isDisabled = [node.target.getAttribute(CLASS.DISABLED) !== null, node.target.classList.contains(CLASS.DISABLED)];
+        return isDisabled.some(isDisabled => isDisabled);
+    };
+
+
+    /**
+     * 条件一致の判定。(いずれかがtrue)
+     */
+    const copiedSyncToOrigin = (targetNode, copiedNode) => {
+        const nodeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                const isDisabled = checkToDisabled(mutation);
+                syncStateButton(isDisabled, copiedNode);
+            });
+        });
+        nodeObserver.observe(targetNode, {
+            attributes: true
+        });
+    };
+
+    /**
+     * Elementの作成。
+     */
+    const createButton = (className, id, buttonText) => {
+        const button = document.createElement("button");
+        button.className = className;
+        button.id = id;
+        button.textContent = buttonText;
+        return button;
+    };
+
+    /**
+     * Elementの追加。
+     */
+    const addElementsFn = (query, element) => {
+        const addTarget = document.querySelector(query);
+        addTarget.appendChild(element);
+        console.log("Element is added");
+    };
+
+    const startObserveDomRendered = () => {
+        const hasNode = {
+            creditRadio: undefined,
+            creditButton: undefined,
+            cashRadio: undefined,
+            cashButton: undefined
+        };
+        const queries = {
+            creditRadio: QUERIES.CREDIT_RADIO,
+            creditButton: QUERIES.CREDIT_BTN,
+            cashRadio: QUERIES.CASH_RADIO,
+            cashButton: QUERIES.CASH_BTN
+        };
+
+        /**
+         * 対象のNodeが存在すればオブジェクトを更新。
+         */
+        const checkNodesRendered = (node) => {
+            Object.keys(queries).forEach(queryKey => {
+                if (node.target.querySelector(queries[queryKey])) {
+                    hasNode[queryKey] = node.target.querySelector(queries[queryKey]);
+                    console.log(`${queryKey}Node rendered`);
+                }
+            });
+        };
+
+        /**
+         * 全ての対象Nodeが取得できたか判定。
+         */
+        const hasAllNodes = () => {
+            if (Object.values(hasNode).every(count => count)) {
+                targetOfParentObserver.disconnect();
+                console.log("targetOfParentObserver disconnected");
+                console.log("all targets rendered");
+                afterLoadingFn(hasNode);
+            }
+        };
+
+        /**
+         * 対象の親Nodeの監視。
+         */
+        const targetOfParentObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                checkNodesRendered(mutation);
+            });
+            hasAllNodes();
+        });
+        const targetOfParent = document.querySelector(QUERIES.TARGET_OF_PARENT);
+        targetOfParentObserver.observe(targetOfParent, {
+            childList: true,
+            subtree: true
+        });
+    };
+
+    const afterLoadingFn = (hasNodes) => {
+        const initialButton = createButton("copiedPaymentButton disabled", "initialButton", "初期値ボタン");
+        const copiedCredit = createButton("copiedPaymentButton disabled hidden", "copiedCredit", "クレジット決済");
+        const copiedCash = createButton("copiedPaymentButton disabled hidden", "copiedCash", "代引き決済");
+        addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, initialButton);
+        addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, copiedCredit);
+        addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, copiedCash);
+
+            /**
+             *支払いを選択したとき、非選択の購入確定ボタンを非表示にする
+             */
+            imitateRadioAction(hasNodes.creditRadio, {
+                    displayNodes: [copiedCash, initialButton],
+                    hideNodes: [copiedCredit]
+                }
+            );
+            imitateRadioAction(hasNodes.cashRadio, {
+                    displayNodes: [copiedCredit, initialButton],
+                    hideNodes: [copiedCash]
+                }
+            );
+
+            /**
+             * コピーボタンをクリックしたときにオリジナルのボタンをクリックする。
+             */
+            syncClickEvent(copiedCredit, hasNodes.creditButton);
+            syncClickEvent(copiedCash, hasNodes.cashButton);
+
+            /**
+             * オリジナルのボタンの活性状態を同期する。
+             */
+            copiedSyncToOrigin(hasNodes.creditButton, copiedCredit);
+            copiedSyncToOrigin(hasNodes.cashButton, copiedCash);
+    };
+
+    startObserveDomRendered();
+
+</script>
+
+<style>
+  button.copiedPaymentButton.disabled {
+    pointer-events: none;
+    background-color: #ccc;
+    color: #aaa;
+  }
+
+  div.bat-form-field.bat-form--cashondelivery-payment-submit {
+    display: none;
+  }
+
+  a.bat-cta-style.button-secondary-dark.center {
+    display: none;
+  }
+
+  a.bat-cta-style.button-secondary-dark.center.disabled {
+    pointer-events: none;
+    background: #dedede;
+    cursor: not-allowed;
+    opacity: 1;
+    color: #aaa;
+    display: none;
+  }
+
+  button.copiedPaymentButton.hidden {
+    display: none;
+  }
+
+  button.copiedPaymentButton {
+    background-color: #f5c342;
+    border: 0;
+    color: black;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 45px;
+    border-radius: 50px;
+    font: inherit;
+    font-weight: bold;
+  }
+</style>
