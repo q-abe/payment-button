@@ -4,7 +4,7 @@
         CREDIT_RADIO: ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']",
         CASH_RADIO: ".cashondelivery-method-section input[name='creditCardHeader']",
         CREDIT_BTN: ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']",
-        CASH_BTN: ".conf:irm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']",
+        CASH_BTN: ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']",
         ADD_BTN_JUST_BEFORE: "#cashondeliveryForm",
         COPIED_CREDIT_BTN: "#copiedCredit",
         COPIED_CASH_BTN: "#copiedCash",
@@ -24,9 +24,6 @@
         REMOVE: "remove"
     };
 
-
-    const COPY_BUTTON_NODE = `<div><button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button></div>`;
-
     /**
      *対象のNodeに変化が起きたらcallback関数を実行する。
      */
@@ -39,8 +36,8 @@
      */
     const setHiddenClass = (node, property) => {
         const isAdd = property === EVENT.ADD;
-        isAdd ? node.classList.add(HIDDEN_CLASS)
-            : node.classList.remove(HIDDEN_CLASS);
+        isAdd ? node.classList.add(CLASS.HIDDEN)
+            : node.classList.remove(CLASS.HIDDEN);
     };
 
     /**
@@ -124,6 +121,26 @@
         });
     };
 
+    /**
+     * Elementの作成。
+     */
+    const createButton = (className, id, buttonText) => {
+        const button = document.createElement("button");
+        button.className = className;
+        button.id = id;
+        button.textContent = buttonText;
+        return button;
+    };
+
+    /**
+     * Elementの追加。
+     */
+    const addElementsFn = (query, element) => {
+        const addTarget = document.querySelector(query);
+        addTarget.appendChild(element);
+        console.log("Element is added");
+    };
+
     const startObserveDomRendered = () => {
         const hasNode = {
             creditRadio: undefined,
@@ -158,7 +175,6 @@
                 targetOfParentObserver.disconnect();
                 console.log("targetOfParentObserver disconnected");
                 console.log("all targets rendered");
-                addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, EVENT.AFTER_END, COPY_BUTTON_NODE);
                 afterLoadingFn(hasNode);
             }
         };
@@ -179,21 +195,14 @@
         });
     };
 
-    /**
-     * Elementの追加。
-     */
-    const addElementsFn = (query, position, element) => {
-        const addTarget = document.querySelector(query);
-        addTarget.insertAdjacentHTML(position, element);
-        console.log(`Element is added at the ${position}`);
-    };
-
     const afterLoadingFn = (hasNodes) => {
-        const copiedCredit = document.querySelector(QUERIES.COPIED_CREDIT_BTN);
-        const copiedCash = document.querySelector(QUERIES.COPIED_CASH_BTN);
-        const initialButton = document.querySelector(QUERIES.INITIAL_BTN);
+        const initialButton = createButton("copiedPaymentButton disabled", "initialButton", "初期値ボタン");
+        const copiedCredit = createButton("copiedPaymentButton disabled hidden", "copiedCredit", "クレジット決済");
+        const copiedCash = createButton("copiedPaymentButton disabled hidden", "copiedCash", "代引き決済");
+        addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, initialButton);
+        addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, copiedCredit);
+        addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, copiedCash);
 
-        if (copiedCredit && copiedCash && initialButton) {
             /**
              *支払いを選択したとき、非選択の購入確定ボタンを非表示にする
              */
@@ -219,7 +228,6 @@
              */
             copiedSyncToOrigin(hasNodes.creditButton, copiedCredit);
             copiedSyncToOrigin(hasNodes.cashButton, copiedCash);
-        }
     };
 
     startObserveDomRendered();
