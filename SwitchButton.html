@@ -1,38 +1,44 @@
 <script>
-    const TARGET_OF_PARENT_QUERY = ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment";
+    const QUERIES = {
+        TARGET_OF_PARENT: ".form.aem-GridColumn--tablet--10.aem-GridColumn--phone--none.aem-GridColumn--tablet--none.aem-GridColumn--phone--10.aem-GridColumn.aem-GridColumn--offset--phone--1.aem-GridColumn--default--5.aem-GridColumn--offset--tablet--1 bat-form-cashondeliverypayment",
+        CREDIT_RADIO: ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']",
+        CASH_RADIO: ".cashondelivery-method-section input[name='creditCardHeader']",
+        CREDIT_BTN: ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']",
+        CASH_BTN: ".conf:irm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']",
+        ADD_BTN_JUST_BEFORE: "#cashondeliveryForm",
+        COPIED_CREDIT_BTN: "#copiedCredit",
+        COPIED_CASH_BTN: "#copiedCash",
+        INITIAL_BTN: "#initialButton"
+    };
 
-    const CREDIT_RADIO_QUERY = ".bat-form-field.bat-form--cashondelivery-payment-credit-card-header input[name='creditCardHeader']";
-    const CASH_RADIO_QUERY = ".cashondelivery-method-section input[name='creditCardHeader']";
-    const CREDIT_BUTTON_QUERY = ".bat-form-field.bat-form--cashondelivery-payment-submit button[class='bat-cta-style button-secondary-dark']";
-    const CASH_BUTTON_QUERY = ".confirm-order-button-block a[class='bat-cta-style button-secondary-dark center disabled']";
+    const CLASS = {
+        HIDDEN: "hidden",
+        DISABLED: "disabled"
+    };
+
+    const EVENT = {
+        CHANGE: "change",
+        CLICK: "click",
+        AFTER_END: "afterend",
+        ADD: "add",
+        REMOVE: "remove"
+    };
+
 
     const COPY_BUTTON_NODE = `<div><button class="copiedPaymentButton disabled" id="initialButton">初期値ボタン</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCredit">クレジット決済</button></div><div><button class="copiedPaymentButton disabled hidden" id="copiedCash">代引き決済</button></div>`;
-    const ADD_BTN_JUST_BEFORE_QUERY = "#cashondeliveryForm";
-
-    const HIDDEN_CLASS = "hidden";
-    const DISABLED_CLASS = "disabled";
-    const CHANGE = "change";
-    const CLICK = "click";
-    const AFTER_END = "afterend";
-    const ADD = "add";
-    const REMOVE = "remove";
-
-    const copiedCreditQuery = "#copiedCredit";
-    const copiedCashQuery = "#copiedCash";
-    const initialButtonQuery = "#initialButton";
 
     /**
      *対象のNodeに変化が起きたらcallback関数を実行する。
      */
     const setChangeAction = (node, callback) => {
-        node.addEventListener(CHANGE, callback);
+        node.addEventListener(EVENT.CHANGE, callback);
     };
 
     /**
      *受け取ったプロパティによってHiddenを追加、削除する。
      */
     const setHiddenClass = (node, property) => {
-        const isAdd = property === ADD;
+        const isAdd = property === EVENT.ADD;
         isAdd ? node.classList.add(HIDDEN_CLASS)
             : node.classList.remove(HIDDEN_CLASS);
     };
@@ -42,10 +48,10 @@
      */
     const toggleHiddenClasses = ({addNodes, removeNodes}) => {
         addNodes.forEach(addNode => {
-            setHiddenClass(addNode, ADD);
+            setHiddenClass(addNode, EVENT.ADD);
         });
         removeNodes.forEach(removeNode => {
-            setHiddenClass(removeNode, REMOVE);
+            setHiddenClass(removeNode, EVENT.REMOVE);
         });
     };
 
@@ -66,14 +72,14 @@
      *クリックイベントによるcallback関数の実行。
      */
     const SynchronizationEvent = (node, callback) => {
-        node.addEventListener(CLICK, callback);
+        node.addEventListener(EVENT.CLICK, callback);
     };
 
     /**
      *オリジナルボタンのクリック。
      */
     const copiedClickEvent = (origin) => {
-        const clickEvent = new Event(CLICK);
+        const clickEvent = new Event(EVENT.CLICK);
         origin.click();
     };
 
@@ -90,15 +96,15 @@
      * 判定次第でdisableの切り替え。
      */
     const syncStateButton = (isDisabled, copiedNode) => {
-        isDisabled ? copiedNode.classList.add(DISABLED_CLASS)
-            : copiedNode.classList.remove(DISABLED_CLASS);
+        isDisabled ? copiedNode.classList.add(CLASS.DISABLED)
+            : copiedNode.classList.remove(CLASS.DISABLED);
     };
 
     /**
      * 条件一致の判定。(いずれかがtrue)
      */
     const checkToDisabled = (node) => {
-        const isDisabled = [node.target.getAttribute(DISABLED_CLASS) !== null, node.target.classList.contains(DISABLED_CLASS)];
+        const isDisabled = [node.target.getAttribute(CLASS.DISABLED) !== null, node.target.classList.contains(CLASS.DISABLED)];
         return isDisabled.some(isDisabled => isDisabled);
     };
 
@@ -126,10 +132,10 @@
             cashButton: undefined
         };
         const queries = {
-            creditRadio: CREDIT_RADIO_QUERY,
-            creditButton: CREDIT_BUTTON_QUERY,
-            cashRadio: CASH_RADIO_QUERY,
-            cashButton: CASH_BUTTON_QUERY
+            creditRadio: QUERIES.CREDIT_RADIO,
+            creditButton: QUERIES.CREDIT_BTN,
+            cashRadio: QUERIES.CASH_RADIO,
+            cashButton: QUERIES.CASH_BTN
         };
 
         /**
@@ -152,7 +158,7 @@
                 targetOfParentObserver.disconnect();
                 console.log("targetOfParentObserver disconnected");
                 console.log("all targets rendered");
-                addElementsFn(ADD_BTN_JUST_BEFORE_QUERY, AFTER_END, COPY_BUTTON_NODE);
+                addElementsFn(QUERIES.ADD_BTN_JUST_BEFORE, EVENT.AFTER_END, COPY_BUTTON_NODE);
                 afterLoadingFn(hasNode);
             }
         };
@@ -166,7 +172,7 @@
             });
             hasAllNodes();
         });
-        const targetOfParent = document.querySelector(TARGET_OF_PARENT_QUERY);
+        const targetOfParent = document.querySelector(QUERIES.TARGET_OF_PARENT);
         targetOfParentObserver.observe(targetOfParent, {
             childList: true,
             subtree: true
@@ -183,9 +189,9 @@
     };
 
     const afterLoadingFn = (hasNodes) => {
-        const copiedCredit = document.querySelector(copiedCreditQuery);
-        const copiedCash = document.querySelector(copiedCashQuery);
-        const initialButton = document.querySelector(initialButtonQuery);
+        const copiedCredit = document.querySelector(QUERIES.COPIED_CREDIT_BTN);
+        const copiedCash = document.querySelector(QUERIES.COPIED_CASH_BTN);
+        const initialButton = document.querySelector(QUERIES.INITIAL_BTN);
 
         if (copiedCredit && copiedCash && initialButton) {
             /**
